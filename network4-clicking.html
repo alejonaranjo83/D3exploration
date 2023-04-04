@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Grafo de Red Dinámico con Nombres y Descripciones</title>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <svg id="grafico"></svg>
+
+  <div id="cuadroTexto"></div>
+
+  <script>
+    const nodos = [
+      { id: 0, cercania: 1, name: "Nodo 0" },
+      { id: 1, cercania: 2, name: "Nodo 1" },
+      { id: 2, cercania: 3, name: "Nodo 2" },
+      { id: 3, cercania: 1, name: "Nodo 3" },
+      { id: 4, cercania: 3, name: "Nodo 4" },
+      { id: 5, cercania: 2, name: "Nodo 5" }
+    ];
+
+    const conexiones = [
+      { source: 0, target: 1 },
+      { source: 1, target: 2 },
+      { source: 2, target: 3 },
+      { source: 3, target: 0 },
+      { source: 2, target: 4 },
+      { source: 4, target: 5 },
+      { source: 5, target: 1 }
+    ];
+
+    const svg = d3.select("#grafico")
+      .attr("width", 550)
+      .attr("height", 850);
+
+    const simulacion = d3.forceSimulation(nodos)
+      .force("enlace", d3.forceLink(conexiones).distance(60))
+      .force("carga", d3.forceManyBody().strength(-100))
+      .force("centro", d3.forceCenter(125, 75))
+      .force("cercania", d3.forceRadial(d => d.cercania * 25, 125, 75));
+
+    const conexiones_sel = svg.selectAll(".conexion")
+      .data(conexiones)
+      .enter()
+      .append("line")
+      .attr("class", "conexion")
+      .style("stroke", "#264653");
+    
+    const nodos_sel = svg.selectAll(".nodo")
+      .data(nodos)
+      .enter()
+      .append("circle")
+      .attr("class", "nodo")
+      .attr("r", 15)
+      .style("fill", "#F4A261")
+    //   .on("click", d => alert(`Descripción de ${d.name}: Lorem ipsum dolor sit amet.`))
+      .on("click", mostrarDescripcion)
+      .on("mouseout", ocultarDescripcion)
+      .call(drag(simulacion));
+
+    const nombres_sel = svg.selectAll(".nombre")
+      .data(nodos)
+      .enter()
+      .append("text")
+      .attr("class", "nombre")
+      .text(d => d.name)
+      .style("font-size", "10px")
+      .attr("x", d => d.x + 20)
+      .attr("y", d => d.y + 8);
+
+    simulacion.on("tick", () => {
+      nodos_sel
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y);
+
+      conexiones_sel
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+
+      nombres_sel
+        .attr("x", d => d.x + 4)
+        .attr("y", d => d.y + 4);
+    });
+
+    function drag(simulacion) {
+      function dragstarted(event) {
+        if (!event.active) simulacion.alphaTarget(0.3).restart();
+        event.subject.fx = event.subject.x;
+        event.subject.fy = event.subject.y;
+      }
+
+      function dragged(event) {
+        event.subject.fx = event.x;
+        event.subject.fy = event.y;
+      }
+
+      function dragended(event) {
+        if (!event.active) simulacion.alphaTarget(0);
+        event.subject.fx = null;
+        event.subject.fy = null;
+      }
+
+      return d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended);
+    }
+
+    function mostrarDescripcion(event, d) {
+        d3.select("#cuadroTexto")
+        .style("display", "block")
+        .style("left", `${d.x}px`)
+        .style("top", `${d.y + 30}px`)
+        // .text(d.descripcion);
+        .html(`<h3>${d.nombre}</h3><p>${d.descripcionBasica}</p>`);
+    }
+
+    function ocultarDescripcion(event, d) {
+        d3.select("#cuadroTexto").style("display", "none");
+    }
+  </script>
+</body>
+</html>
+

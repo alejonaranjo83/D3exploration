@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Grafo de Red Dinámico</title>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+  <svg id="grafico"></svg>
+
+  <script>
+    const nodos = [
+      { id: 0, cercania: 1 },
+      { id: 1, cercania: 2 },
+      { id: 2, cercania: 3 },
+      { id: 3, cercania: 1 },
+      { id: 4, cercania: 3 },
+      { id: 5, cercania: 2 }
+    ];
+
+    const conexiones = [
+      { source: 0, target: 1 },
+      { source: 1, target: 2 },
+      { source: 2, target: 3 },
+      { source: 3, target: 0 },
+      { source: 2, target: 4 },
+      { source: 4, target: 5 },
+      { source: 5, target: 1 }
+    ];
+
+    const svg = d3.select("#grafico")
+      .attr("width", 250)
+      .attr("height", 150);
+
+    const simulacion = d3.forceSimulation(nodos)
+      .force("enlace", d3.forceLink(conexiones).distance(40))
+      .force("carga", d3.forceManyBody().strength(-100))
+      .force("centro", d3.forceCenter(125, 75))
+      .force("cercania", d3.forceRadial(d => d.cercania * 25, 125, 75));
+
+    const nodos_sel = svg.selectAll(".nodo")
+      .data(nodos)
+      .enter()
+      .append("circle")
+      .attr("class", "nodo")
+      .attr("r", 10)
+      .style("fill", "red");
+
+    const conexiones_sel = svg.selectAll(".conexion")
+      .data(conexiones)
+      .enter()
+      .append("line")
+      .attr("class", "conexion")
+      .style("stroke", "black");
+
+    simulacion.on("tick", () => {
+      nodos_sel.attr("cx", d => d.x)
+        .attr("cy", d => d.y);
+      conexiones_sel.attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+    });
+
+  </script>
+</body>
+</html>

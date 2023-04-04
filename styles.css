@@ -1,0 +1,11 @@
+#cuadroTexto {
+    position: absolute;
+    z-index: 999;
+    display: none;
+    background-color: #2A9D8F;
+    /* border: 1px solid black; */
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 10px;
+  }
