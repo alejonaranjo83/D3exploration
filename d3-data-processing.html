@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data JS + D3</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <h1>Data processing with D3</h1>
+    <!-- <script src="./script.js"> -->
+    <script>
+        const datos = [10, 9, 8, 2, 1];
+        const media = d3.mean(datos);
+        console.log(`el promedio es ${media}`)
+        const median = d3.median(datos);
+        console.log(`la mediana es ${median}`)
+        const deviation = d3.deviation(datos);
+        console.log(`la desviación es ${deviation}`)
+    </script>
+</body>
+</html>
